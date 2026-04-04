@@ -126,13 +126,13 @@ export default function Profile() {
              <div className="flex flex-wrap gap-2 mb-6">
                 <span className="bg-white/10 text-white/90 text-xs px-4 py-2 border border-white/10 rounded-full font-medium">{creator.location}</span>
                 <span className="bg-cyan-500/20 text-cyan-300 text-xs px-4 py-2 border border-cyan-500/30 rounded-full font-medium">{creator.niche}</span>
-                {creator.tags.map(t => (
+                {creator.tags?.map(t => (
                   <span key={t} className="bg-white/5 border border-white/10 text-white/70 text-xs px-4 py-2 rounded-full capitalize font-medium">{t}</span>
                 ))}
              </div>
 
              <div className="space-y-3">
-                {creator.platforms.map(p => {
+                {creator.platforms?.map(p => {
                   const href = p === 'Instagram' && creator.instagram ? `https://www.instagram.com/${creator.instagram}/` : null;
                   const content = (
                     <div className="flex items-center justify-between py-3 px-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
@@ -156,7 +156,7 @@ export default function Profile() {
                  <TrendingUp size={18} className="text-cyan-400" /> Past Collaborations
              </h3>
              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {creator.portfolio.map((p, i) => (
+                {creator.portfolio?.map((p, i) => (
                   <div key={i} className="bg-white/5 rounded-2xl p-4 border border-white/10">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center shadow-lg">
