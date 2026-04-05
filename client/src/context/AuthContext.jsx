@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+import { supabase } from '../supabase';
+
 const AuthContext = createContext(null);
 
-export const SUPABASE_URL = 'https://cmrcubdcazblpudsrphl.supabase.co';
-export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtcmN1YmRjYXpibHB1ZHNycGhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNjc3MTMsImV4cCI6MjA5MDk0MzcxM30.XCBm9o40Mv5W0utR8aTikWmYuDtfUi-SlYkcWfL6X6Q';
+export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://cmrcubdcazblpudsrphl.supabase.co';
+export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtcmN1YmRjYXpibHB1ZHNycGhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNjc3MTMsImV4cCI6MjA5MDk0MzcxM30.XCBm9o40Mv5W0utR8aTikWmYuDtfUi-SlYkcWfL6X6Q';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -56,13 +58,39 @@ export function AuthProvider({ children }) {
         email: uData.email,
         token: token,
         hasProfile: pData.length > 0,
-        profile: pData[0] || null
+        profile: pData[0] || null,
+        role: pData[0]?.role,
+        full_name: pData[0]?.full_name || pData[0]?.name,
+        avatar_url: pData[0]?.avatar_url
       });
     } catch (e) {
       localStorage.removeItem('access_token');
       setUser(null);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const uploadAvatar = async (file) => {
+    if (!user || !user.id) return { success: false, error: 'No user session' };
+    
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}/avatar.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+        
+      if (uploadError) throw uploadError;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+        
+      return { success: true, url: publicUrl };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
   };
 
@@ -116,8 +144,10 @@ export function AuthProvider({ children }) {
   const completeOnboarding = async (profileData) => {
     if (!user || !user.token) return { success: false, error: 'No session' };
     
-    // Set default avatar based on name
-    profileData.avatar_url = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(profileData.full_name || 'User')}&backgroundColor=6C3EF6&textColor=ffffff`;
+    // Set default avatar based on name if not provided
+    if (!profileData.avatar_url) {
+      profileData.avatar_url = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(profileData.full_name || 'User')}&backgroundColor=6C3EF6&textColor=ffffff`;
+    }
 
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
@@ -131,7 +161,7 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({
           id: user.id,
           email: user.email,
-          name: profileData.full_name, // Mapping explicitly for schema
+          name: profileData.full_name, // Mapping for backward compatibility
           ...profileData
         })
       });
@@ -145,7 +175,10 @@ export function AuthProvider({ children }) {
       setUser({
         ...user,
         hasProfile: true,
-        profile: newProfile[0]
+        profile: newProfile[0],
+        role: newProfile[0].role,
+        full_name: newProfile[0].full_name,
+        avatar_url: newProfile[0].avatar_url
       });
       return { success: true };
     } catch (error) {
@@ -159,7 +192,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout, completeOnboarding }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, logout, completeOnboarding, uploadAvatar }}>
       {!loading && children}
     </AuthContext.Provider>
   );

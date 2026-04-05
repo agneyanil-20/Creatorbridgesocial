@@ -1,217 +1,239 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MOCK_CREATORS } from '../data/mockData';
-import { Star, MapPin, ArrowLeft, ExternalLink, CheckCircle, Bookmark, MoreHorizontal, TrendingUp, Mail } from 'lucide-react';
+import { supabase } from '../supabase';
+import { 
+  Star, 
+  MapPin, 
+  ArrowLeft, 
+  ExternalLink, 
+  CheckCircle, 
+  Bookmark, 
+  MoreHorizontal, 
+  TrendingUp, 
+  Mail, 
+  Instagram, 
+  Globe, 
+  MessageSquare,
+  BadgeCheck,
+  Loader2
+} from 'lucide-react';
+import { NICHE_ICONS } from '../constants';
 
 export default function Profile() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const creator = MOCK_CREATORS.find(c => c.id === id);
+  const [creator, setCreator] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [id]);
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      setCreator(data);
+    } catch (e) {
+      console.error('Error fetching profile:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#fafbff] flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-[#6C3EF6] animate-spin" />
+      </div>
+    );
+  }
 
   if (!creator) {
     return (
-      <div className="min-h-screen bg-[#07070a] flex items-center justify-center text-white">
-        <div className="text-center">
-          <p className="text-6xl mb-4">😕</p>
-          <h2 className="text-2xl font-bold mb-2">Creator not found</h2>
-          <button onClick={() => navigate('/creators')} className="text-blue-400 font-semibold hover:underline">Browse creators →</button>
+      <div className="min-h-screen bg-[#fafbff] flex items-center justify-center">
+        <div className="text-center p-12 bg-white rounded-[3rem] border border-gray-100 shadow-2xl shadow-purple-50">
+          <p className="text-6xl mb-6">😕</p>
+          <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Profile not found</h2>
+          <p className="text-gray-400 mb-8 font-medium">The creator you're looking for doesn't exist.</p>
+          <button 
+            onClick={() => navigate('/creators')} 
+            className="bg-[#6C3EF6] text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[#5B33D1] transition-all"
+          >
+            Browse creators →
+          </button>
         </div>
       </div>
     );
   }
 
-  const platformIcon = (p) => {
-    switch (p) {
-      case 'Instagram': return '📸';
-      case 'YouTube': return '▶';
-      case 'TikTok': return '♪';
-      case 'Twitch': return '🎮';
-      default: return '📱';
-    }
-  };
+  const avatar = creator.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${creator.username}&backgroundColor=6C3EF6&textColor=ffffff`;
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white">
-      {/* Immersive Banner */}
-      <div className="h-[40vh] relative overflow-hidden">
-        <img 
-          src={creator.avatar_url} 
-          className="w-full h-full object-cover blur-3xl scale-125 opacity-40" 
-          alt="" 
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#09090b]/50 to-[#09090b]" />
+    <div className="min-h-screen bg-[#fafbff]">
+      {/* Premium Header Banner */}
+      <div className="h-[35vh] relative overflow-hidden bg-gradient-to-br from-purple-600 via-[#6C3EF6] to-indigo-700">
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-white rounded-full blur-[120px]" />
+          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-purple-400 rounded-full blur-[120px]" />
+        </div>
         
-        {/* Top Navigation */}
-        <div className="absolute top-6 inset-x-0 max-w-5xl mx-auto px-6 flex justify-between items-center z-20">
+        {/* Navigation Over Header */}
+        <div className="absolute top-8 inset-x-0 max-w-7xl mx-auto px-6 flex justify-between items-center z-20">
           <button
             onClick={() => navigate(-1)}
-            className="p-3 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 hover:bg-white/10 transition-all shadow-2xl"
+            className="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all shadow-xl"
           >
-            <ArrowLeft size={24} />
+            <ArrowLeft size={20} />
           </button>
           <div className="flex gap-4">
-            <button className="p-3 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 hover:bg-white/10 transition-all shadow-2xl">
-              <Bookmark size={24} />
-            </button>
-            <button className="p-3 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 hover:bg-white/10 transition-all shadow-2xl">
-              <MoreHorizontal size={24} />
+            <button className="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all shadow-xl">
+              <Bookmark size={20} />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Profile Header Section */}
-      <div className="max-w-5xl mx-auto px-6 relative -mt-32 pb-24">
-        <div className="flex flex-col lg:flex-row gap-12 items-start">
+      {/* Profile Content Body */}
+      <div className="max-w-7xl mx-auto px-6 relative -mt-32 pb-24">
+        <div className="flex flex-col lg:flex-row gap-12">
           
-          {/* LARGE IMAGE HOLDER BOX */}
-          <div className="relative group flex-shrink-0">
-             <div className="absolute inset-x-0 -bottom-4 bg-cyan-500 rounded-[3rem] blur-2xl opacity-40" />
-             <div className="relative w-72 h-72 sm:w-80 sm:h-80 rounded-[3.5rem] overflow-hidden border-8 border-[#09090b] shadow-2xl bg-[#121214]">
-                <img 
-                  src={creator.avatar_url} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                  alt={creator.full_name} 
-                />
-             </div>
-             {/* Trending Badge Overlay */}
-             <div className="absolute top-6 -right-4 bg-gradient-to-r from-orange-400 to-red-500 px-4 py-2 rounded-2xl flex items-center gap-2 shadow-2xl border border-white/20 transform rotate-12">
-                <TrendingUp size={16} className="text-white" />
-                <span className="text-xs font-black text-white italic">HOT</span>
-             </div>
-          </div>
-
-          {/* Info Section */}
-          <div className="flex-1 lg:pt-16">
-            <div className="flex items-center gap-4 mb-4">
-              <h1 className="text-5xl sm:text-6xl font-black tracking-tighter leading-none">{creator.full_name}</h1>
-              <CheckCircle size={32} className="text-cyan-400 flex-shrink-0" />
-            </div>
-            
-            <div className="flex flex-wrap gap-4 items-center mb-8">
-               <span className="bg-white/5 border border-white/10 px-4 py-1.5 rounded-full text-sm font-bold text-gray-400 tracking-wide">
-                  @{creator.instagram}
-               </span>
-               <div className="h-4 w-px bg-white/20" />
-               <div className="flex items-center gap-2 text-cyan-400 font-bold bg-cyan-400/10 px-4 py-1.5 rounded-full text-sm">
-                  <Star size={16} className="fill-cyan-400" />
-                  {creator.rating} Rating
+          {/* Sidebar / Profile Card */}
+          <div className="w-full lg:w-96 flex-shrink-0">
+            <div className="bg-white rounded-[3.5rem] p-10 border border-gray-100 shadow-2xl shadow-purple-200/40 relative overflow-hidden group">
+               {/* User Avatar */}
+               <div className="relative mb-8 text-center">
+                  <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-[3.5rem] overflow-hidden mx-auto border-8 border-white shadow-2xl bg-gray-50 transform group-hover:scale-[1.02] transition-transform duration-700">
+                     <img 
+                       src={avatar} 
+                       className="w-full h-full object-cover" 
+                       alt={creator.username} 
+                     />
+                  </div>
+                  {/* Badge */}
+                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white text-[#6C3EF6] px-5 py-2 rounded-2xl flex items-center gap-2 shadow-xl border border-purple-50">
+                     <BadgeCheck size={18} />
+                     <span className="text-[10px] font-black uppercase tracking-widest leading-none">Verified {creator.role}</span>
+                  </div>
                </div>
-               <div className="h-4 w-px bg-white/20" />
-               <div className="flex items-center gap-2 text-gray-400 font-bold bg-white/5 px-4 py-1.5 rounded-full text-sm">
-                  <MapPin size={16} />
-                  {creator.location}
-               </div>
-            </div>
 
-            <p className="text-xl text-gray-400 font-medium leading-relaxed max-w-2xl italic">
-              "{creator.bio}"
-            </p>
+               <div className="text-center mt-10">
+                  <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-2 leading-none">{creator.full_name || creator.username}</h1>
+                  <p className="text-[#6C3EF6] text-sm font-black uppercase tracking-widest mb-6">@{creator.username}</p>
+                  
+                  <div className="flex items-center justify-center gap-2 mb-8">
+                     <div className="px-5 py-2 bg-purple-50 text-[#6C3EF6] rounded-full text-[10px] font-black uppercase tracking-[0.1em] border border-purple-100 flex items-center gap-2">
+                        {NICHE_ICONS[creator.niche] || '✨'} {creator.niche}
+                     </div>
+                  </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mt-12 mb-12">
-               <div className="bg-white/5 border border-white/5 p-6 rounded-[2rem]">
-                  <p className="text-xs text-gray-600 font-black uppercase tracking-[0.2em] mb-2 leading-none">Reach</p>
-                  <p className="text-3xl font-black text-white">
-                    {creator.follower_count >= 1000000 
-                      ? `${(creator.follower_count / 1000000).toFixed(1)}M` 
-                      : `${(creator.follower_count / 1000).toFixed(0)}K`}
-                  </p>
-               </div>
-               <div className="bg-white/5 border border-white/5 p-6 rounded-[2rem]">
-                  <p className="text-xs text-gray-600 font-black uppercase tracking-[0.2em] mb-2 leading-none">Avg. Cost</p>
-                  <p className="text-3xl font-black text-cyan-400">
-                    ${creator.rate_per_post >= 1000 
-                       ? `${(creator.rate_per_post/1000).toFixed(0)}k` 
-                       : creator.rate_per_post}
-                  </p>
-               </div>
-               <div className="bg-white/5 border border-white/5 p-6 rounded-[2rem] hidden sm:block">
-                  <p className="text-xs text-gray-600 font-black uppercase tracking-[0.2em] mb-2 leading-none">Reviews</p>
-                  <p className="text-3xl font-black text-white">{creator.reviews}+</p>
-               </div>
-            </div>
+                  <hr className="border-gray-50 mb-8" />
 
-            <div className="flex flex-col sm:flex-row gap-4">
-               <button 
-                 onClick={() => navigate('/deals')}
-                 className="flex-1 bg-white text-black font-black text-lg py-5 rounded-[2rem] hover:scale-[1.02] transition-transform shadow-[0_20px_40px_rgba(255,255,255,0.1)]"
-               >
-                 Send Request
-               </button>
-               <button className="px-8 py-5 rounded-[2rem] border-2 border-white/10 hover:border-white/30 transition-all flex items-center justify-center gap-3">
-                 <Mail size={20} />
-                 <span className="font-bold">Contact</span>
-               </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Portfolio / Niche Modules */}
-        <div className="mt-24 grid grid-cols-1 lg:grid-cols-3 gap-12">
-           <div className="lg:col-span-2 space-y-12">
-              <div>
-                 <h3 className="text-3xl font-black tracking-tight mb-8">Recent Collaborations</h3>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {creator.portfolio.map((p, i) => (
-                      <div key={i} className="bg-[#121214] border border-white/5 p-8 rounded-[2.5rem] group hover:border-cyan-500/50 transition-colors shadow-2xl">
-                         <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mb-6">
-                            <span className="text-xl font-black italic">{p.brand[0]}</span>
-                         </div>
-                         <h4 className="text-xl font-bold text-white mb-2">{p.title}</h4>
-                         <p className="text-gray-500 font-medium text-sm mb-6">{p.brand}</p>
-                         <div className="bg-cyan-400/10 border border-cyan-400/20 px-4 py-2 rounded-xl inline-flex items-center gap-2">
-                            <TrendingUp size={14} className="text-cyan-400" />
-                            <span className="text-xs font-black text-cyan-400 uppercase tracking-widest">{p.result}</span>
-                         </div>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-
-              <div>
-                 <h3 className="text-3xl font-black tracking-tight mb-8">Instagram Feed</h3>
-                 <div className="grid grid-cols-3 gap-4">
-                    {[1,2,3,4,5,6].map(i => (
-                      <div key={i} className="aspect-square bg-[#121214] rounded-3xl overflow-hidden border border-white/5 group">
-                         <div className="w-full h-full flex items-center justify-center opacity-20 group-hover:opacity-100 transition-opacity">
-                            📸
-                         </div>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-           </div>
-
-           <div className="space-y-12">
-              <div className="bg-white/5 border border-white/10 p-8 rounded-[3rem] shadow-2xl">
-                 <h3 className="text-xl font-black tracking-tight mb-8">Platforms</h3>
-                 <div className="space-y-4">
-                    {creator.platforms.map(p => (
-                      <div key={p} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-all cursor-pointer group">
+                  {/* Social & Contact Links */}
+                  <div className="space-y-3 mb-10 text-left">
+                     {creator.instagram && (
+                       <a 
+                         href={`https://instagram.com/${creator.instagram.replace('@', '')}`} 
+                         target="_blank" 
+                         rel="noreferrer"
+                         className="flex items-center justify-between p-5 bg-gray-50 hover:bg-purple-50 rounded-2xl border border-gray-50 hover:border-purple-100 transition-all group/link"
+                       >
                          <div className="flex items-center gap-4">
-                            <span className="text-xl">{platformIcon(p)}</span>
-                            <span className="font-bold text-gray-300 group-hover:text-white">{p}</span>
+                            <Instagram size={18} className="text-gray-400 group-hover/link:text-[#6C3EF6]" />
+                            <span className="text-sm font-bold text-gray-600 group-hover/link:text-gray-900">Instagram</span>
                          </div>
-                         <ExternalLink size={18} className="text-gray-600 group-hover:text-cyan-400" />
-                      </div>
-                    ))}
-                 </div>
-              </div>
+                         <ExternalLink size={16} className="text-gray-200 group-hover/link:text-[#6C3EF6]" />
+                       </a>
+                     )}
+                     {creator.website && (
+                       <a 
+                         href={creator.website} 
+                         target="_blank" 
+                         rel="noreferrer"
+                         className="flex items-center justify-between p-5 bg-gray-50 hover:bg-purple-50 rounded-2xl border border-gray-50 hover:border-purple-100 transition-all group/link"
+                       >
+                         <div className="flex items-center gap-4">
+                            <Globe size={18} className="text-gray-400 group-hover/link:text-[#6C3EF6]" />
+                            <span className="text-sm font-bold text-gray-600 group-hover/link:text-gray-900">Website</span>
+                         </div>
+                         <ExternalLink size={16} className="text-gray-200 group-hover/link:text-[#6C3EF6]" />
+                       </a>
+                     )}
+                  </div>
 
-              <div className="bg-white/5 border border-white/10 p-8 rounded-[3rem] shadow-2xl">
-                 <h3 className="text-xl font-black tracking-tight mb-8">Niche Focus</h3>
-                 <div className="flex flex-wrap gap-2">
-                    <span className="bg-cyan-400 text-black px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest leading-none">
-                       {creator.niche}
-                    </span>
-                    {creator.tags.map(t => (
-                      <span key={t} className="bg-white/5 border border-white/10 text-gray-500 px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest leading-none hover:text-white hover:border-white transition-colors">
-                         {t}
-                      </span>
-                    ))}
-                 </div>
-              </div>
-           </div>
+                  <button className="w-full py-5 bg-[#6C3EF6] text-white font-black rounded-[2rem] shadow-xl shadow-purple-200/50 hover:scale-[1.02] transition-all flex items-center justify-center gap-3 active:scale-95">
+                     <MessageSquare size={20} />
+                     Connect Now
+                  </button>
+               </div>
+            </div>
+          </div>
+
+          {/* Main Info Area */}
+          <div className="flex-1 lg:pt-32">
+             <div className="bg-white rounded-[3.5rem] border border-gray-100 p-10 md:p-12 shadow-sm">
+                <div className="flex items-center gap-2 mb-6">
+                   <TrendingUp size={24} className="text-[#6C3EF6]" />
+                   <h2 className="text-2xl font-black text-gray-900 tracking-tight leading-none uppercase tracking-[0.1em] text-xs font-black text-gray-400">About Creator</h2>
+                </div>
+                
+                <div className="relative">
+                   <p className="text-xl sm:text-2xl text-gray-700 font-medium leading-relaxed italic mb-12">
+                     "{creator.bio || "No bio provided yet. Just browsing the marketplace for now!"}"
+                   </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                   <div className="p-8 bg-gray-50/50 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden">
+                      <div className="relative z-10">
+                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 leading-none">Reach</p>
+                         <p className="text-3xl font-black text-gray-900">
+                           {creator.follower_count >= 1000000 
+                             ? `${(creator.follower_count / 1000000).toFixed(1)}M` 
+                             : creator.follower_count >= 1000 ? `${(creator.follower_count / 1000).toFixed(0)}K` : creator.follower_count || '0'}
+                         </p>
+                      </div>
+                   </div>
+                   <div className="p-8 bg-purple-50/50 rounded-[2.5rem] border border-purple-100 shadow-sm relative overflow-hidden">
+                      <div className="relative z-10">
+                         <p className="text-[10px] font-black text-[#6C3EF6] uppercase tracking-widest mb-2 leading-none">Avg. Cost</p>
+                         <p className="text-3xl font-black text-[#6C3EF6]">
+                           ${creator.rate_per_post >= 1000 
+                              ? `${(creator.rate_per_post/1000).toFixed(0)}k` 
+                              : creator.rate_per_post || '0'}
+                         </p>
+                      </div>
+                   </div>
+                   <div className="p-8 bg-gray-50/50 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden">
+                      <div className="relative z-10">
+                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 leading-none">Rating</p>
+                         <p className="text-3xl font-black text-gray-900">4.9/5.0</p>
+                      </div>
+                   </div>
+                </div>
+
+                <div className="mt-16 pt-12 border-t border-gray-50 flex flex-col md:flex-row gap-8 items-center justify-between">
+                   <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center">
+                         <CheckCircle size={24} />
+                      </div>
+                      <div>
+                         <p className="text-sm font-bold text-gray-900">Identity Verified</p>
+                         <p className="text-xs text-gray-400 font-medium">Verified through Stripe Connect</p>
+                      </div>
+                   </div>
+                   <button className="flex items-center gap-2 text-gray-400 font-bold hover:text-gray-600 transition-all text-sm group">
+                      Report Profile <ArrowLeft size={16} className="rotate-180 transform group-hover:translate-x-1 transition-transform" />
+                   </button>
+                </div>
+             </div>
+          </div>
         </div>
       </div>
     </div>
