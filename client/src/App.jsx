@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
 import Creators from './pages/Creators';
 import Campaigns from './pages/Campaigns';
@@ -13,9 +14,18 @@ import Deals from './pages/Deals';
 import Messages from './pages/Messages';
 import Payments from './pages/Payments';
 
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children, requireProfile = true }) {
   const { user } = useAuth();
-  return user ? children : <Navigate to="/login" replace />;
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (requireProfile && !user.hasProfile) {
+    return <Navigate to="/onboarding" replace />;
+  }
+  
+  return children;
 }
 
 function AppRoutes() {
@@ -29,6 +39,8 @@ function AppRoutes() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
           <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
+          <Route path="/onboarding" element={<ProtectedRoute requireProfile={false}><Onboarding /></ProtectedRoute>} />
+          
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/creators" element={<ProtectedRoute><Creators /></ProtectedRoute>} />
           <Route path="/campaigns" element={<ProtectedRoute><Campaigns /></ProtectedRoute>} />
@@ -36,6 +48,7 @@ function AppRoutes() {
           <Route path="/deals" element={<ProtectedRoute><Deals /></ProtectedRoute>} />
           <Route path="/messages/:dealId" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
           <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
+          
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

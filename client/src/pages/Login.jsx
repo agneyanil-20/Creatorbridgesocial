@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth, DEMO_ACCOUNTS } from '../context/AuthContext';
-import { MessageCircle, Eye, EyeOff, Zap } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { MessageCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
   const { login } = useAuth();
@@ -16,8 +16,7 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    await new Promise(r => setTimeout(r, 600));
-    const result = login(email, password);
+    const result = await login(email, password);
     setLoading(false);
     if (result.success) {
       navigate('/dashboard');
@@ -26,20 +25,9 @@ export default function Login() {
     }
   };
 
-  const loginDemo = async (account) => {
-    setEmail(account.email);
-    setPassword(account.password);
-    setLoading(true);
-    await new Promise(r => setTimeout(r, 500));
-    const result = login(account.email, account.password);
-    setLoading(false);
-    if (result.success) navigate('/dashboard');
-  };
-
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-purple-50 via-white to-indigo-50 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        {/* Card */}
         <div className="bg-white rounded-3xl shadow-2xl shadow-purple-100 border border-gray-100 p-8">
           <div className="text-center mb-8">
             <div className="w-14 h-14 bg-gradient-to-br from-[#6C3EF6] to-[#a855f7] rounded-2xl mx-auto flex items-center justify-center mb-4">
@@ -47,37 +35,6 @@ export default function Login() {
             </div>
             <h1 className="text-2xl font-extrabold text-gray-900">Welcome back</h1>
             <p className="text-gray-500 mt-1">Sign in to your CreatorBridge account</p>
-          </div>
-
-          {/* Demo Accounts */}
-          <div className="mb-6">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Zap size={12} className="text-yellow-500" /> Quick Demo Login
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {DEMO_ACCOUNTS.map(acc => (
-                <button
-                  key={acc.id}
-                  onClick={() => loginDemo(acc)}
-                  className="flex items-center gap-2 p-2.5 rounded-xl border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all text-left group"
-                >
-                  <img src={acc.avatar_url} className="w-7 h-7 rounded-full flex-shrink-0" alt="" />
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-gray-800 truncate">{acc.full_name || acc.company_name}</p>
-                    <p className="text-[10px] text-gray-400 capitalize">{acc.role}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-100" />
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-3 text-gray-400">or sign in manually</span>
-            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
