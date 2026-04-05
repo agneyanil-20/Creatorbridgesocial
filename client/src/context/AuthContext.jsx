@@ -10,6 +10,20 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Check for tokens in URL hash (returned from OAuth)
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token=')) {
+      const params = new URLSearchParams(hash.substring(1));
+      const token = params.get('access_token');
+      if (token) {
+        localStorage.setItem('access_token', token);
+        validateSession(token);
+        // Clear hash from URL
+        window.history.replaceState(null, null, window.location.pathname);
+        return;
+      }
+    }
+
     const token = localStorage.getItem('access_token');
     if (token) {
       validateSession(token);
