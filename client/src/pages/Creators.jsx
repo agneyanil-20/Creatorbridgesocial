@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabaseClient';
 import { NICHES, NICHE_ICONS, PLATFORMS } from '../constants';
 import { Search, Star, MessageSquare, BadgeCheck, X, Users, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 
