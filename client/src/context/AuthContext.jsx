@@ -116,6 +116,8 @@ export function AuthProvider({ children }) {
         },
         body: JSON.stringify({
           id: user.id,
+          email: user.email,
+          name: profileData.full_name, // Mapping explicitly for schema
           ...profileData
         })
       });
