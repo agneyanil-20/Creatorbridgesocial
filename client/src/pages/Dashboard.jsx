@@ -229,18 +229,18 @@ function CreatorDashboard({ user }) {
           </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {MOCK_CAMPAIGNS.slice(0, 2).map(c => (
-            <div key={c.id} onClick={() => navigate('/campaigns')} className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:border-purple-100 transition-all cursor-pointer group">
+          {(MOCK_CAMPAIGNS || []).slice(0, 2).map(c => (
+            <div key={c?.id} onClick={() => navigate('/campaigns')} className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:border-purple-100 transition-all cursor-pointer group">
               <div className="flex items-start gap-3 mb-3">
-                <img src={c.logo} className="w-10 h-10 rounded-xl" alt="" />
+                <img src={c?.logo} className="w-10 h-10 rounded-xl" alt="" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-gray-900 text-sm leading-tight">{c.title}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{c.company_name}</p>
+                  <p className="font-bold text-gray-900 text-sm leading-tight line-clamp-1">{c?.title}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{c?.company_name}</p>
                 </div>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-green-600">${c.budget.toLocaleString()} budget</span>
-                <span className="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded-full font-medium">{c.platform}</span>
+                <span className="text-sm font-bold text-green-600">${(c?.budget)?.toLocaleString()} budget</span>
+                <span className="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded-full font-medium">{c?.platform}</span>
               </div>
             </div>
           ))}
