@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { NICHES, NICHE_ICONS } from '../constants';
-import { Briefcase, Video, ChevronDown, Camera, User, Instagram, Globe, Info, Loader2 } from 'lucide-react';
+import { Briefcase, Video, ChevronDown, Camera, User, Link, Globe, Info, Loader2 } from 'lucide-react';
 
 export default function Onboarding() {
   const { user, completeOnboarding, uploadAvatar } = useAuth();
@@ -225,7 +225,7 @@ export default function Onboarding() {
                   <div>
                     <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Instagram</label>
                     <div className="relative">
-                      <Instagram size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <Link size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
                         type="text"
                         value={instagram}

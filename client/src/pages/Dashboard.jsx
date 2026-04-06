@@ -12,7 +12,7 @@ import {
   Briefcase, 
   Video,
   ArrowRight,
-  UserEdit,
+  UserPen,
   ExternalLink,
   Users
 } from 'lucide-react';

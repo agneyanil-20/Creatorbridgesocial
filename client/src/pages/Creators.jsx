@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { NICHES, NICHE_ICONS, PLATFORMS } from '../constants';
-import { Search, Star, MessageSquare, BadgeCheck, X, Users, ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { Search, Star, MessageSquare, CheckCircle2, X, Users, ArrowRight, RefreshCw } from 'lucide-react';
 
 const ALL_NICHES = ['All', ...NICHES];
 
@@ -40,7 +40,7 @@ function CreatorCard({ creator, onView }) {
           <h3 className="text-xl font-black text-gray-900 tracking-tight group-hover:text-[#6C3EF6] transition-colors truncate">
             {creator.full_name || creator.username}
           </h3>
-          <BadgeCheck size={18} className="text-[#6C3EF6] flex-shrink-0" />
+          <CheckCircle2 size={18} className="text-[#6C3EF6] flex-shrink-0" />
         </div>
         <p className="text-[#6C3EF6] text-[11px] font-bold tracking-widest uppercase mb-4 mb-3">
           @{creator.username || creator.full_name?.toLowerCase().replace(' ', '_')}
@@ -109,7 +109,7 @@ export default function Creators() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-12">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-[#6C3EF6] rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
-              <Sparkles size={12} /> Creator Directory
+              <Star size={12} /> Creator Directory
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-none mb-4">
               Connect with <br className="hidden md:block" />Verified Talent
