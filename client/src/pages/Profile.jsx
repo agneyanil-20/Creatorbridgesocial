@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-// import { supabase } from '../lib/supabaseClient';
+import { useAuth } from "../context/AuthContext";
 import { 
   User, 
   MapPin, 
@@ -9,11 +8,11 @@ import {
   Briefcase, 
   ShieldCheck, 
   Mail, 
-  ExternalLink,
-  MessageCircle,
-  Video,
-  Award,
-  CheckCircle2
+  ExternalLink, 
+  MessageCircle, 
+  Video, 
+  Award, 
+  CheckCircle2 
 } from 'lucide-react';
 import { Button, LoadingPage, Alert } from '../components/Common';
 
@@ -26,11 +25,15 @@ export default function Profile() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // fetchProfile();
-    setProfile(currentUser);
+    // Current fallback logic: show the current user's profile
+    // This avoids using the broken supabase import
+    if (currentUser) {
+      setProfile(currentUser);
+    }
   }, [id, currentUser]);
 
   /*
+  // Database fetching is currently disabled to prevent build errors
   const fetchProfile = async () => {
     setLoading(true);
     try {
