@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabaseClient';
+// import { supabase } from '../lib/supabaseClient';
 import { 
   User, 
   MapPin, 
@@ -22,13 +22,15 @@ export default function Profile() {
   const { user: currentUser } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchProfile();
-  }, [id]);
+    // fetchProfile();
+    setProfile(currentUser);
+  }, [id, currentUser]);
 
+  /*
   const fetchProfile = async () => {
     setLoading(true);
     try {
@@ -50,6 +52,7 @@ export default function Profile() {
       setLoading(false);
     }
   };
+  */
 
   if (loading) return <LoadingPage />;
   if (error) return <div className="p-12 text-center"><Alert message={error} /></div>;
